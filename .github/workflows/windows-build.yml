@@ -1,0 +1,31 @@
+name: Windows desktop build
+# Explicit preview builds only; never publishes or claims Windows 8.1 certification.
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
+          architecture: x64
+      - run: python -m unittest discover -s tests -v
+      - run: python tests/gui_smoke.py
+      - run: python -m pip install pyinstaller==6.16.0
+      - run: python -m PyInstaller --noconfirm --clean --onedir --windowed --noupx --name Bridge81 --collect-submodules bridge81 --paths . scripts/desktop_entry.py
+      - name: Smoke-test the frozen workbench
+        shell: powershell
+        run: |
+          $app = Start-Process -FilePath dist/Bridge81/Bridge81.exe -ArgumentList '--smoke-test' -PassThru
+          if (-not $app.WaitForExit(30000)) { $app.Kill(); throw 'Frozen GUI smoke test timed out' }
+          if ($app.ExitCode -ne 0) { throw ('Frozen GUI smoke test failed: ' + $app.ExitCode) }
+      - run: python scripts/prepare_desktop.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Bridge81-0.1.0-windows-x64-preview
+          path: dist/Bridge81
+          if-no-files-found: error

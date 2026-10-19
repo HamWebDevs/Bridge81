@@ -1,0 +1,23 @@
+name: Bug report
+description: Report a reproducible Bridge81 problem.
+body:
+  - type: textarea
+    id: system
+    attributes:
+      label: System and runtimes
+      description: Windows version/architecture, Python, Cygwin, and GPU/driver if relevant. Omit personal usernames.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and observed behavior
+      description: Include a minimal trusted example. Do not upload game builds, saves or private log contents.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
