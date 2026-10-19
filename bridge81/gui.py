@@ -56,6 +56,10 @@ and .exe, then Inspect. Bridge81 reads small metadata files and PE headers;
 it does not execute game Python, unpack archives, replace DLLs or touch saves.
 Reports intentionally say UNVERIFIED when no known blocker is found.
 
+Use Inspect DLLs for direct/delay import names and bundled architecture
+evidence. Files absent from the bundle may be supplied by Windows; system
+availability stays unknown. Inspection does not load any DLL or game.
+
 For missing api-ms-win-crt-*.dll errors, use Repair runtime, or double-click
 Repair-RenPy.cmd even if Bridge81 cannot start. This separate Python-free
 utility adds Microsoft's verified application-local UCRT set, with backups
@@ -74,7 +78,7 @@ fallback. Replacing a bundled engine can break compiled scripts and saves.
 
 TESTING STATUS
 
-This is a 0.2 preview targeting Windows 8.1. The core has automated tests;
+This is a 0.3 preview targeting Windows 8.1. The core has automated tests;
 modern Windows CI is not a test on Windows 8.1 or on your GPU. See docs/testing.md
 for the real-device checklist. No telemetry or automatic game downloads.
 """
@@ -301,6 +305,7 @@ class App:
         ttk.Button(row, text="Preview launch", command=lambda: self.game_action(False)).pack(side="left", padx=(0, 8))
         ttk.Button(row, text="Launch game", command=lambda: self.game_action(True)).pack(side="left", padx=(0, 8))
         ttk.Button(row, text="Export report", command=self.export_report).pack(side="left")
+        ttk.Button(row, text="Inspect DLLs", command=self.inspect_dependencies).pack(side="left", padx=(8, 0))
         repair_row = ttk.Frame(parent)
         repair_row.pack(fill="x", pady=(0, 3))
         ttk.Button(repair_row, text="Repair missing runtime", command=self.repair_runtime).pack(side="left", padx=(0, 10))
@@ -326,6 +331,15 @@ class App:
         try:
             open_runtime_repair()
             self.status.set("Runtime repair opened. Choose your game's main EXE in that window.")
+        except (BridgeError, OSError) as exc:
+            self.fail(exc)
+
+    def inspect_dependencies(self):
+        try:
+            from .dependencies import inspect_dependencies, report_markdown
+            report = inspect_dependencies(self.folder.get(), exe=self.game_exe.get() or None, target=self.target.get())
+            self.set_text(self.game_output, report_markdown(report))
+            self.status.set("Read-only DLL evidence: %s modules, %s imports. System availability remains unknown." % (report['summary']['modules'], report['summary']['imports']))
         except (BridgeError, OSError) as exc:
             self.fail(exc)
 

@@ -41,11 +41,28 @@ def main():
             assert app.last_report.engine_version == (8, 3, 7)
             assert "unverified" in app.game_output.get("1.0", "end")
             assert hasattr(app, "repair_runtime")
+            app.inspect_dependencies()
+            assert "Static direct/delay-import evidence" in app.game_output.get("1.0", "end")
+            assert "1 modules, 0 imports" in app.status.get()
             app.profile.set("low-memory")
             app.game_action(False)
             assert "RENPY_LESS_MEMORY" in app.game_output.get("1.0", "end")
+            app.tabs.select(app.game_tab)
+            root.deiconify()
+            for width in (1000, 780):
+                root.geometry(str(width) + 'x660')
+                root.update()
+                def descendants(widget):
+                    for child in widget.winfo_children():
+                        yield child
+                        yield from descendants(child)
+                buttons = [w for w in descendants(app.game_tab) if w.winfo_class() == 'TButton'
+                           and w.cget('text') in {'Inspect game', 'Inspect DLLs', 'Preview launch', 'Launch game', 'Export report'}]
+                assert len(buttons) == 5
+                for button in buttons:
+                    assert button.winfo_ismapped() and button.winfo_x() + button.winfo_width() <= button.master.winfo_width(), button.cget('text')
             root.update()
-            print("GUI smoke passed: widgets, preview, background run, game inspection and launch preview.")
+            print("GUI smoke passed: widgets, preview, background run, game/DLL inspection and launch preview.")
         finally:
             root.destroy()
 

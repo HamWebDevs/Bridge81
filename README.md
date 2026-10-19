@@ -4,11 +4,11 @@
 
 Bridge81 is a small, local desktop app for giving an older Windows laptop a few more useful jobs. Run Python scripts in project environments, use Bash through Cygwin, and investigate why an older Ren'Py game will not start.
 
-**0.2.1 preview.** Windows 8.1 is the target, not a verified compatibility claim. Core tests and native GUI smoke checks run on modern Windows and Linux. Actual Windows 8.1 hardware and GPU validation are still needed. See [testing status](docs/testing.md).
+**0.3.0 preview.** Windows 8.1 is the target, not a verified compatibility claim. Core tests and native GUI smoke checks run on modern Windows and Linux. Actual Windows 8.1 hardware and GPU validation are still needed. See [testing status](docs/testing.md).
 
 ## Game says a runtime DLL is missing?
 
-Download [**Bridge81-0.2.1-runtime-repair.zip**](https://github.com/HamWebDevs/Bridge81/releases/download/v0.2.1/Bridge81-0.2.1-runtime-repair.zip), extract the whole ZIP, and open **Repair-RenPy.cmd**. Choose the game's main EXE and click **Repair runtime**. It uses Windows' built-in tools and opens even when a missing UCRT stops Python or the main workbench from starting.
+Download [**Bridge81-0.3.0-runtime-repair.zip**](https://github.com/HamWebDevs/Bridge81/releases/download/v0.3.0/Bridge81-0.3.0-runtime-repair.zip), extract the whole ZIP, and open **Repair-RenPy.cmd**. Choose the game's main EXE and click **Repair runtime**. It uses Windows' built-in tools and opens even when a missing UCRT stops Python or the main workbench from starting.
 
 The repair downloads Microsoft's complete matching UCRT set, verifies its checksums, places it beside the launcher and recognized engine executables, and provides **Undo** with original-file backups. It targets errors such as `api-ms-win-crt-heap-l1-1-0.dll is missing`; other game requirements still apply. [Repair details and offline downloads](docs/runtime-repair.md).
 
@@ -29,7 +29,7 @@ Use the traditional **Python 3.12** installer for the documented Windows 8.1 bas
 
 [Windows setup and troubleshooting](docs/windows81.md) · [Game compatibility](docs/games.md) · [Contributing](CONTRIBUTING.md)
 
-[Download the 0.2.1 preview](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.2.1) for the small runtime repair, complete source ZIP or optional standalone x64 workbench. Read the release's compatibility status before choosing a build.
+[Download the 0.3.0 preview](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.3.0) for the small runtime repair, complete source ZIP or optional standalone x64 workbench. Read the release's compatibility status before choosing a build.
 
 ## What you can do
 
@@ -38,6 +38,7 @@ Use the traditional **Python 3.12** installer for the documented Windows 8.1 bas
 | Python projects | Choose an interpreter, working folder and exact arguments; create a new venv; capture output; cancel or set a timeout. |
 | Unix scripts | Run `.sh` scripts with an installed Cygwin Bash, including paths with spaces and positional arguments. |
 | Older Ren'Py games | Read engine metadata and PE headers; flag known OS/architecture blockers; export a report without absolute paths or dialogue. |
+| DLL evidence | Inspect direct/delay imports and bundled architectures without running the game; [CLI and DevPocket plugin](docs/dependencies.md). |
 | Missing UCRT DLLs | Separate Python-free runtime repair; verified Microsoft files, architecture matching, original-file backups and Undo. |
 | Troubleshooting | Apply temporary low-memory, windowed, no-audio or no-joystick settings to a selected game launch. |
 | Automation | Use the same plans, inspection and execution through a dependency-free CLI and Python API. |
@@ -70,6 +71,7 @@ python -m bridge81 plan python examples/hello.py --args-json "[\"hello world\"]"
 python -m bridge81 run python examples/hello.py
 python -m bridge81 run venv C:\Projects\demo\.venv
 python -m bridge81 game C:\Games\Story --exe Story.exe --format markdown
+python -m bridge81 dependencies C:\Games\Story --exe Story.exe --format json
 python -m bridge81 plan renpy C:\Games\Story --exe Story.exe --profile low-memory
 python -m bridge81 run renpy C:\Games\Story --exe Story.exe --profile windowed
 ```

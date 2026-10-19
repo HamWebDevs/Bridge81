@@ -2,7 +2,7 @@
 
 For errors such as **api-ms-win-crt-heap-l1-1-0.dll is missing**, **api-ms-win-crt-runtime-l1-1-0.dll is missing**, or a missing **ucrtbase.dll** on Windows 8.1.
 
-1. Download the small **runtime-repair ZIP** from [Bridge81 releases](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.2.1) and extract the **whole** ZIP.
+1. Download the small **runtime-repair ZIP** from [Bridge81 releases](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.3.0) and extract the **whole** ZIP.
 2. Close the game and double-click **Repair-RenPy.cmd**.
 3. Click **Choose game**, select the main game EXE beside its `game` and `renpy` folders, then click **Repair runtime**.
 4. Start the game normally. To reverse the repair, choose the same EXE and click **Undo repair**.

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bridge81"
-version = "0.2.1"
+version = "0.3.0"
 description = "A lightweight Python, Cygwin and Ren'Py workbench for Windows 8.1."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -25,6 +25,9 @@ bridge81 = "bridge81.cli:main"
 
 [project.gui-scripts]
 bridge81-gui = "bridge81.gui:main"
+
+[project.entry-points."devpocket.tools"]
+bridge81-game = "bridge81.integration:build_tool"
 
 [project.urls]
 Source = "https://github.com/HamWebDevs/Bridge81"

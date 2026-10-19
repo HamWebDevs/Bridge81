@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-10-19
+
+- Add bounded PE direct/delay-import inspection, a Games-tab **Inspect DLLs** action and JSON/Markdown CLI reports.
+- Classify UCRT, Visual C++, API contracts and application libraries; show nearby bundle candidates and architecture mismatches while keeping system availability unknown.
+- Inspect recognized game/Python engine files and Python DLLs, including Python-prefixed folders. Ignore unrelated helpers and preserve all game files.
+- Add the optional read-only `bridge81-game` DevPocket API v1 plugin for CLI, SARIF and explicit MCP exposure. It never launches or repairs and remains uncached.
+- Add malformed-image, delayed-import, sparse-file, path and architecture regression tests, installed plugin checks and native GUI smoke coverage.
+- Retain the Python-free UCRT repair, backups, Undo and 0.2.1 mixed-helper fix. Actual Windows 8.1 validation remains limited to the documented user report.
+
 ## 0.2.1 — 2026-10-19
 
 - Fix a false architecture conflict when a 32-bit updater/helper sits beside a 64-bit Ren'Py engine.

@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/release.yml
       - scripts/publish_preview.py
+      - pyproject.toml
   workflow_dispatch:
 permissions:
   contents: read
@@ -34,7 +35,7 @@ jobs:
           path: dist
       - uses: actions/download-artifact@v4
         with:
-          name: Bridge81-0.2.1-windows-x64-preview
+          name: Bridge81-0.3.0-windows-x64-preview
           path: desktop/Bridge81
       - name: Publish a prerelease with verified build outputs
         run: python scripts/publish_preview.py

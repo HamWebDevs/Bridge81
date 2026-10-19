@@ -36,6 +36,11 @@ def parser() -> argparse.ArgumentParser:
     inspect.add_argument("--exe", help="Executable path relative to the game folder.")
     inspect.add_argument("--target", choices=("x86", "x64"), default="x64")
     inspect.add_argument("--format", choices=("json", "markdown"), default="json")
+    dependencies = commands.add_parser("dependencies", help="Read direct/delay DLL imports without loading the game or its libraries.")
+    dependencies.add_argument("folder")
+    dependencies.add_argument("--exe", help="Executable relative to the extracted game folder.")
+    dependencies.add_argument("--target", choices=("x86", "x64"), default="x64")
+    dependencies.add_argument("--format", choices=("json", "markdown"), default="json")
     for mode in ("plan", "run"):
         command = commands.add_parser(mode, help="Preview a command." if mode == "plan" else "Execute a selected script, create a venv, or launch a game.")
         command.add_argument("kind", choices=("python", "bash", "venv", "renpy"))
@@ -66,6 +71,11 @@ def main(argv: list[str] | None = None) -> int:
             report = inspect_game(options.folder, exe=options.exe, target=options.target)
             print(report_markdown(report) if options.format == "markdown" else json.dumps(report.as_dict(), indent=2))
             return 2 if report.status == "blocked" else 0
+        if options.command == "dependencies":
+            from .dependencies import inspect_dependencies, report_markdown
+            report = inspect_dependencies(options.folder, exe=options.exe, target=options.target)
+            print(report_markdown(report) if options.format == "markdown" else json.dumps(report, indent=2))
+            return 1 if report['summary']['unreadable_modules'] else 0
         args = arguments(options.args_json)
         if options.kind == "python":
             plan = python_plan(options.path, args, python=options.python, cwd=options.cwd)

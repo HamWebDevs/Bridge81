@@ -1,6 +1,6 @@
 # Validation record
 
-Version: **0.2.1 preview**. Development date: **2026-10-19**.
+Version: **0.3.0 preview**. Development date: **2026-10-19**.
 
 ## Runtime repair validation
 
@@ -20,8 +20,8 @@ The unit/integration suite exercises real Python execution, exact arguments with
 
 Completed locally on a Linux development host with Python 3.12.14:
 
-- **44 unit/integration tests passed.**
-- **Native Tk GUI smoke passed:** widget creation, exact-argument preview, a background script run, game inspection and launch preview.
+- **62 unit/integration tests passed** for 0.3.0, including malformed PE images, direct/delay imports, bounded sparse-file reads and bundle evidence.
+- **Native Tk GUI smoke passed:** widget creation, exact-argument preview, a background script run, game/DLL inspection and launch preview.
 - **Desktop layout reviewed at 1000×660**, within a 1366×768 virtual display. The host's bitmap-font fallback is not representative of Windows' Segoe UI rendering.
 - **Wheel and source distribution built**, with the installed wheel's CLI checked outside the source tree.
 - **Official Python installer SHA-256 checked** against the actual downloaded installer, not just copied metadata.
