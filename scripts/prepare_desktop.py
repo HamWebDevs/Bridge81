@@ -33,12 +33,14 @@ def main():
                 copied += 1
     if not copied:
         raise SystemExit("Cannot locate PyInstaller's license; stopping distribution preparation.")
-    for name in ("README.md", "LICENSE", "THIRD_PARTY.md", "Start-Bridge81.cmd", "Setup-Python.cmd"):
+    for name in ("README.md", "LICENSE", "THIRD_PARTY.md", "Start-Bridge81.cmd", "Setup-Python.cmd", "Repair-RenPy.cmd"):
         shutil.copy2(ROOT / name, target / name)
     # Start in a desktop build must use the actual app, not look for source modules.
     (target / "Start-Bridge81.cmd").write_bytes(b'@echo off\r\nstart "" "%~dp0Bridge81.exe"\r\n')
     (target / "scripts").mkdir(exist_ok=True)
     shutil.copy2(ROOT / "scripts/Setup-Python.ps1", target / "scripts/Setup-Python.ps1")
+    for name in ("Repair-RenPy.ps1", "RuntimeRepair.ps1", "ucrt-manifest.json"):
+        shutil.copy2(ROOT / "scripts" / name, target / "scripts" / name)
     shutil.copytree(ROOT / "docs", target / "docs", dirs_exist_ok=True)
     shutil.copytree(ROOT / "examples", target / "examples", dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))

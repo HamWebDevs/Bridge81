@@ -17,6 +17,7 @@ from .model import BridgeError, Plan
 from .plans import bash_plan, python_plan, venv_plan
 from .renpy import PROFILES, game_plan, inspect_game, report_markdown
 from .runner import launch_game, run
+from .runtime_repair import open_runtime_repair
 
 GUIDE = """GET STARTED ON WINDOWS 8.1
 
@@ -55,6 +56,11 @@ and .exe, then Inspect. Bridge81 reads small metadata files and PE headers;
 it does not execute game Python, unpack archives, replace DLLs or touch saves.
 Reports intentionally say UNVERIFIED when no known blocker is found.
 
+For missing api-ms-win-crt-*.dll errors, use Repair runtime, or double-click
+Repair-RenPy.cmd even if Bridge81 cannot start. This separate Python-free
+utility adds Microsoft's verified application-local UCRT set, with backups
+and Undo. It downloads only when you click Repair. See docs/runtime-repair.md.
+
 Ren'Py 8.4+ needs Windows 10 and is blocked for this Windows 8.1 target.
 An older engine may work, but graphics drivers and game dependencies matter.
 Low-memory trades speed/updates for lower memory use; windowed, no-audio and
@@ -68,7 +74,7 @@ fallback. Replacing a bundled engine can break compiled scripts and saves.
 
 TESTING STATUS
 
-This is a 0.1 preview targeting Windows 8.1. The core has automated tests;
+This is a 0.2 preview targeting Windows 8.1. The core has automated tests;
 modern Windows CI is not a test on Windows 8.1 or on your GPU. See docs/testing.md
 for the real-device checklist. No telemetry or automatic game downloads.
 """
@@ -295,6 +301,10 @@ class App:
         ttk.Button(row, text="Preview launch", command=lambda: self.game_action(False)).pack(side="left", padx=(0, 8))
         ttk.Button(row, text="Launch game", command=lambda: self.game_action(True)).pack(side="left", padx=(0, 8))
         ttk.Button(row, text="Export report", command=self.export_report).pack(side="left")
+        repair_row = ttk.Frame(parent)
+        repair_row.pack(fill="x", pady=(0, 3))
+        ttk.Button(repair_row, text="Repair missing runtime", command=self.repair_runtime).pack(side="left", padx=(0, 10))
+        ttk.Label(repair_row, text="For api-ms-win-crt DLL errors; also available as Repair-RenPy.cmd", style="Sub.TLabel").pack(side="left")
         self.game_output = self.text_box(parent)
         self.set_text(self.game_output, "Inspect the extracted Windows game before launching.\n\nKnown OS or architecture blockers prevent launch. Other results remain UNVERIFIED until tested on your laptop.\n\nFor graphics problems, hold Shift while starting the game or press Shift+G, then try GL or ANGLE in its graphics menu.")
 
@@ -311,6 +321,13 @@ class App:
                 return
             self.folder.set(str(root))
             self.game_exe.set(relative.as_posix())
+
+    def repair_runtime(self):
+        try:
+            open_runtime_repair()
+            self.status.set("Runtime repair opened. Choose your game's main EXE in that window.")
+        except (BridgeError, OSError) as exc:
+            self.fail(exc)
 
     def current_report(self):
         return inspect_game(self.folder.get(), exe=self.game_exe.get() or None, target=self.target.get())

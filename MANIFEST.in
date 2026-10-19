@@ -1,5 +1,5 @@
-include Start-Bridge81.cmd Setup-Python.cmd run_bridge81.py LICENSE CHANGELOG.md CONTRIBUTING.md SECURITY.md AGENTS.md THIRD_PARTY.md
-recursive-include docs *.md
+include Start-Bridge81.cmd Setup-Python.cmd Repair-RenPy.cmd run_bridge81.py LICENSE CHANGELOG.md CONTRIBUTING.md SECURITY.md AGENTS.md THIRD_PARTY.md
+recursive-include docs *.md *.txt
 recursive-include examples *.py *.sh
-recursive-include scripts *.py *.ps1
-recursive-include tests *.py
+recursive-include scripts *.py *.ps1 *.json
+recursive-include tests *.py *.ps1

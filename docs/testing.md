@@ -1,6 +1,12 @@
 # Validation record
 
-Version: **0.1.0 preview**. Development date: **2026-10-19**.
+Version: **0.2.0 preview**. Development date: **2026-10-19**.
+
+## Runtime repair validation
+
+The release gate runs `tests/runtime_repair_test.ps1` using **Windows PowerShell** on modern Windows. It downloads the actual Microsoft SDK redistributable cabinets, checks their pinned hashes, uses Windows `expand.exe`, verifies all 82 x86/x64 DLLs, matches a mixed-architecture Ren'Py fixture, installs three complete runtime sets, checks executable/data preservation, restores an original DLL, refuses later user changes and receipt traversal, repairs a corrupted cache and injects a write failure to check rollback. It also checks junction rejection. Native repair-window smoke checks run before and after desktop packaging.
+
+Local PowerShell 7 checks on Linux use an extraction fixture backed by `cabextract`; those checks exercise the same official payloads and repair transactions but do not establish Windows PowerShell or Windows 8.1 behaviour. The Windows release gate supplies the native Windows checks. Consult the completed workflow before reporting a CI result.
 
 ## Automated coverage
 
@@ -29,6 +35,9 @@ A dedicated real-Cygwin smoke job and a standalone Windows build are part of the
 - [ ] Inspect and launch a trusted older Ren'Py game using each relevant profile.
 - [ ] Confirm Ren'Py 8.4+ is blocked without modifying game files.
 - [ ] Test the actual generated standalone app, Universal CRT and Tcl/Tk loading.
+- [ ] Open Repair-RenPy.cmd without Python installed and verify its large-text picker.
+- [ ] Repair the missing-UCRT error on a real older Ren'Py game, launch it and test Undo.
+- [ ] Test browser-downloaded cabinets when Windows' TLS or certificate store prevents downloads.
 - [ ] Record Windows build, OS architecture, Python, Cygwin, GPU/driver and game engine versions.
 
 Do not claim all games work, all Linux programs work, or Windows 8.1 has been tested until actual device evidence supports the narrower claim. Screenshots of a GUI on Linux or Windows 11 do not prove Windows 8.1 support.

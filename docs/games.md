@@ -24,6 +24,10 @@ The PE checker reads a small header and reports machine architecture, optional-h
 
 These are documented Ren'Py variables, whose availability can vary by engine. Settings affect the launched child only. Bridge81 writes no `environment.txt`, patches no game files and changes no machine environment. The game itself can write its normal logs, configuration and save data. Games are detached and keep running when the workbench closes.
 
+## Missing runtime DLLs
+
+For `api-ms-win-crt-*.dll` or `ucrtbase.dll` errors, use **Games → Repair missing runtime** or the independent **Repair-RenPy.cmd** launcher. That explicit action adds Microsoft's checksum-verified application-local UCRT set and keeps original-file backups with Undo. It also works when Python cannot start. It is separate from read-only inspection and temporary launch profiles. See [runtime repair](runtime-repair.md) for scope, offline downloads and source provenance.
+
 Unknown engines require an explicit trust override. That override does not bypass a recognized OS, header or architecture blocker. Use only trusted game builds: running one grants it your normal user permissions.
 
 ## Graphics issues

@@ -27,9 +27,15 @@ def main():
     wheels = list(source.glob("*.whl"))
     sdists = list(source.glob("*.tar.gz"))
     source_zip = source / ("Bridge81-%s-source.zip" % __version__)
+    repair_zip = source / ("Bridge81-%s-runtime-repair.zip" % __version__)
     desktop = ROOT / "desktop" / "Bridge81"
-    if len(wheels) != 1 or len(sdists) != 1 or not source_zip.is_file():
-        raise SystemExit("Exactly one wheel, sdist and source ZIP are required.")
+    if len(wheels) != 1 or len(sdists) != 1 or not source_zip.is_file() or not repair_zip.is_file():
+        raise SystemExit("Exactly one wheel, sdist, source ZIP and repair ZIP are required.")
+    with zipfile.ZipFile(repair_zip) as archive:
+        expected = {"Repair-RenPy.cmd", "scripts/Repair-RenPy.ps1", "scripts/RuntimeRepair.ps1", "scripts/ucrt-manifest.json",
+                    "docs/runtime-repair.md", "READ-ME.txt", "LICENSE", "THIRD_PARTY.md"}
+        if set(archive.namelist()) != {"Bridge81-Runtime-Repair/" + name for name in expected}:
+            raise SystemExit("Unexpected Python-free repair ZIP contents.")
     pe = inspect_pe(desktop / "Bridge81.exe")
     if pe.architecture != "x64":
         raise SystemExit("Desktop build is not the expected x64 executable.")
@@ -40,7 +46,7 @@ def main():
                 raise SystemExit("Unexpected symlink in desktop artifact.")
             if path.is_file():
                 archive.write(path, path.relative_to(desktop.parent).as_posix())
-    assets = sorted([wheels[0], sdists[0], source_zip, desktop_zip], key=lambda p: p.name)
+    assets = sorted([wheels[0], sdists[0], source_zip, desktop_zip, repair_zip], key=lambda p: p.name)
     sums = source / "SHA256SUMS"
     sums.write_text("".join("%s  %s\n" % (hashlib.sha256(p.read_bytes()).hexdigest(), p.name) for p in assets), encoding="ascii")
     subprocess.run(["gh", "release", "create", "v" + __version__, "--repo", repository, "--target", commit,

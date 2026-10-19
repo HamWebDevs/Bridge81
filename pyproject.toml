@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bridge81"
-version = "0.1.0"
+version = "0.2.0"
 description = "A lightweight Python, Cygwin and Ren'Py workbench for Windows 8.1."
 readme = "README.md"
 requires-python = ">=3.10"

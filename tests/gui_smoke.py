@@ -40,6 +40,7 @@ def main():
             app.inspect_game()
             assert app.last_report.engine_version == (8, 3, 7)
             assert "unverified" in app.game_output.get("1.0", "end")
+            assert hasattr(app, "repair_runtime")
             app.profile.set("low-memory")
             app.game_action(False)
             assert "RENPY_LESS_MEMORY" in app.game_output.get("1.0", "end")

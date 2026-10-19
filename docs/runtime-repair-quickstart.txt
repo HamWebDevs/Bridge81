@@ -1,0 +1,23 @@
+BRIDGE81 - REN'PY RUNTIME REPAIR
+
+For missing api-ms-win-crt-heap-l1-1-0.dll and related Microsoft UCRT files.
+
+1. Extract this WHOLE ZIP. Keep the scripts folder beside Repair-RenPy.cmd.
+2. Close the game. Double-click Repair-RenPy.cmd.
+3. Click Choose game. Select its main EXE beside the game and renpy folders.
+4. Click Repair runtime. Then start the game normally.
+
+No Python installation or administrator permission is required. The first
+repair downloads Microsoft's runtime (less than 1 MB for each architecture).
+Existing runtime files are backed up. Use Undo repair to reverse the change.
+Keep the game's .bridge81-runtime folder until you no longer need Undo.
+
+If Windows cannot download the runtime, open docs/runtime-repair.md for two
+official Microsoft browser download links. Leave the downloaded CAB files
+in your Downloads folder, then click Repair runtime again.
+
+This targets the missing UCRT error. A game can have other requirements.
+Ren'Py 8.4 and newer need Windows 10 and cannot be made compatible by this fix.
+Actual Windows 8.1 game testing is still pending; this is a preview.
+
+Source and updates: https://github.com/HamWebDevs/Bridge81

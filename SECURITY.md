@@ -2,7 +2,7 @@
 
 Bridge81 is a local utility, not a sandbox or malware scanner. A selected script, interpreter, Cygwin tool or game runs with your normal account permissions. Use trusted inputs for execution. Inspection reads ordinary files and does not import game code or load executables.
 
-The app has no telemetry, network listener, login or automatic runtime/game download. Official documentation opens only when a user chooses a link. The optional Python setup downloads from Python.org only, validates a pinned checksum and Authenticode signature, and stops if verification fails.
+The app has no telemetry, network listener, login or automatic runtime/game download. Official documentation opens only when a user chooses a link. The optional Python setup downloads from Python.org only, validates a pinned checksum and Authenticode signature, and stops if verification fails. Explicit UCRT repair downloads pinned Microsoft SDK cabinets, checks cabinet and DLL hashes plus PE architecture, and adds a complete runtime beside the selected game executables. It keeps original-file backups and a relative-path receipt. Undo rejects traversal, junctions, corrupted backups and later changes to the installed files. Local game/cache folders are ordinary user files, not a security boundary against concurrent filesystem changes.
 
 Reports omit absolute paths and log text, but game folder and executable names remain visible. Review reports before sharing. CLI command previews intentionally contain the local paths needed to review a run.
 

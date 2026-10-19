@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0 — 2026-10-19
+
+- Python-free `Repair-RenPy.cmd` and native repair window for missing Microsoft UCRT DLLs.
+- Official SDK 14393.795 runtime downloads pinned by cabinet and individual-file SHA-256; all 41 files per architecture are included in each repair.
+- Separate architecture matching for the launcher and recognized Ren'Py Windows engine folders.
+- Original-file backups, verified Undo, atomic file copies and automatic rollback after write failures.
+- Offline/browser-downloaded cabinet support when old Windows certificate or TLS settings prevent the download.
+- Small standalone repair ZIP, a Games-tab entry point, and Windows PowerShell integration checks with real Microsoft cabinets.
+
+The new utility targets the missing runtime error. Actual Windows 8.1 game verification remains pending.
+
 ## 0.1.0 — 2026-10-19
 
 Initial preview:

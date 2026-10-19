@@ -1,5 +1,7 @@
 # Windows 8.1 setup
 
+For games reporting missing `api-ms-win-crt-*.dll`, start with **Repair-RenPy.cmd**. It uses built-in Windows PowerShell, downloads Microsoft's matching UCRT set and supports Undo; Python is not required. The [small runtime repair ZIP](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.2.0) is sufficient. See [runtime repair](runtime-repair.md).
+
 ## Start from the source ZIP
 
 Extract the complete archive. Do not run a `.cmd` while it is still inside Explorer's ZIP viewer. Keep paths short; Windows 8.1 does not have modern Windows' general long-path support.

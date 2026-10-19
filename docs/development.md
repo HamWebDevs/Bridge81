@@ -8,6 +8,7 @@ Bridge81 runs from a source checkout and needs no third-party runtime packages. 
 - `runner.py` executes non-interactive scripts, bounds captured output, applies timeouts and attempts process-tree cancellation.
 - `renpy.py` produces conservative reports and temporary game plans.
 - `pe.py` reads bounded PE headers without loading executables or DLLs.
+- `runtime_repair.py` opens the separate PowerShell repair utility only after the user selects it; `scripts/RuntimeRepair.ps1` owns verified downloads, architecture checks and reversible UCRT transactions. Run `tests/runtime_repair_test.ps1` in Windows PowerShell for the native integration checks. Microsoft runtime bytes are downloaded, never committed or bundled in the repair ZIP.
 - `doctor.py` checks host information and default paths without running detected programs.
 - `cli.py` and `gui.py` share those implementations.
 

@@ -50,8 +50,14 @@ jobs:
         run: |
           $parseTokens = $null
           $parseErrors = $null
-          [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path scripts/Setup-Python.ps1), [ref]$parseTokens, [ref]$parseErrors) | Out-Null
-          if ($parseErrors.Count -gt 0) { $parseErrors | Format-List; exit 1 }
+          foreach ($file in Get-ChildItem scripts/*.ps1,tests/*.ps1) {
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$parseTokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count -gt 0) { $parseErrors | Format-List; exit 1 }
+          }
+      - name: Python-free runtime repair UI smoke
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./scripts/Repair-RenPy.ps1 -SmokeTest
       - name: Check source launcher
         if: runner.os == 'Windows'
         shell: cmd
@@ -71,6 +77,14 @@ jobs:
         with:
           name: bridge81-source-and-python-distributions
           path: dist/*
+  runtime-repair:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify runtime download, architecture matching, backups and rollback
+        shell: powershell
+        run: ./tests/runtime_repair_test.ps1
   cygwin:
     runs-on: windows-latest
     timeout-minutes: 20

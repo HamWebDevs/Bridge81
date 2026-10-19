@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from bridge81 import __version__
+from package_runtime_repair import package_runtime_repair
 
 
 def main():
@@ -37,6 +38,7 @@ def main():
     (output / (target.name + ".sha256")).write_text("%s  %s\n" % (digest, target.name), encoding="ascii")
     print(target)
     print(digest)
+    print(package_runtime_repair(ROOT, __version__))
 
 
 if __name__ == "__main__":
