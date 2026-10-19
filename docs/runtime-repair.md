@@ -2,7 +2,7 @@
 
 For errors such as **api-ms-win-crt-heap-l1-1-0.dll is missing**, **api-ms-win-crt-runtime-l1-1-0.dll is missing**, or a missing **ucrtbase.dll** on Windows 8.1.
 
-1. Download the small **runtime-repair ZIP** from [Bridge81 releases](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.2.0) and extract the **whole** ZIP.
+1. Download the small **runtime-repair ZIP** from [Bridge81 releases](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.2.1) and extract the **whole** ZIP.
 2. Close the game and double-click **Repair-RenPy.cmd**.
 3. Click **Choose game**, select the main game EXE beside its `game` and `renpy` folders, then click **Repair runtime**.
 4. Start the game normally. To reverse the repair, choose the same EXE and click **Undo repair**.
@@ -11,7 +11,9 @@ The same launcher is included in the complete source and desktop ZIPs. A running
 
 ## What it changes
 
-The utility downloads the Windows 10 SDK **10.0.14393.795** UCRT redistributable directly from Microsoft. It verifies each cabinet's pinned SHA-256 and size, extracts it using Windows' `expand.exe`, then checks each DLL's SHA-256, size and PE architecture. It installs the **complete 41-file set** for the selected executable's architecture and separately matches recognized Ren'Py `lib/windows-*`, `lib/win-*` or `lib/win32` engine folders by reading their EXE headers. A 32-bit launcher and a 64-bit engine receive different matching sets in their respective folders.
+The utility downloads the Windows 10 SDK **10.0.14393.795** UCRT redistributable directly from Microsoft. It verifies each cabinet's pinned SHA-256 and size, extracts it using Windows' `expand.exe`, then checks each DLL's SHA-256, size and PE architecture. It installs the **complete 41-file set** for the selected executable's architecture and separately matches recognized Ren'Py `lib/windows-*`, `lib/win-*` or `lib/win32` engine folders, including `py2-` / `py3-` prefixes, by reading PE headers. A 32-bit launcher and a 64-bit engine receive different matching sets in their respective folders.
+
+Architecture selection prioritizes the game's named engine EXE, `python.exe`, `pythonw.exe`, `renpy.exe` and Python runtime DLLs. A 32-bit helper using the OS `msvcrt.dll` can coexist with a 64-bit engine; its presence no longer causes a false engine conflict. Helper bytes are preserved. If identified game/Python runtime files disagree, repair stops before changing files. A bounded, conservative string scan also refuses opposite-architecture helpers referencing UCRT, cataloged API forwarders or Visual C++ 14 DLL names. This scan is not a complete analysis of transitive or dynamic dependencies. It avoids deliberately placing one incompatible runtime set next to two consumers that both require it.
 
 Only `ucrtbase.dll` and the cataloged `api-ms-win-core-*.dll` / `api-ms-win-crt-*.dll` forwarders are eligible. Existing eligible files are backed up under the game's `.bridge81-runtime` folder; a receipt records relative paths and checksums. Files already matching the official set are left alone. Save data, Python/SDL/graphics libraries, game archives and executable bytes are outside the repair's write set. It does not run the game as a test. Inspection stays read-only; runtime repair is a separate explicit action.
 

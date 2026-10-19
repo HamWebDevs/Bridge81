@@ -1,10 +1,16 @@
 # Validation record
 
-Version: **0.2.0 preview**. Development date: **2026-10-19**.
+Version: **0.2.1 preview**. Development date: **2026-10-19**.
 
 ## Runtime repair validation
 
+### Windows 8.1 user report
+
+On 2026-10-19, a user of Windows 8.1 x64 reported that one Ren'Py game worked after the 0.2.0 UCRT repair. Its game/engine version and a launch log were not recorded, and this was a user report rather than an independently observed device test. A second game hit the overly broad mixed-architecture check; 0.2.1 adds specific regression fixtures for a 32-bit helper beside a 64-bit engine, conflicting Python DLLs and Python-prefixed platform folders. The first report does not establish compatibility with other games or hardware.
+
 The release gate runs `tests/runtime_repair_test.ps1` using **Windows PowerShell** on modern Windows. It downloads the actual Microsoft SDK redistributable cabinets, checks their pinned hashes, uses Windows `expand.exe`, verifies all 82 x86/x64 DLLs, matches a mixed-architecture Ren'Py fixture, installs three complete runtime sets, checks executable/data preservation, restores an original DLL, refuses later user changes and receipt traversal, repairs a corrupted cache and injects a write failure to check rollback. It also checks junction rejection. Native repair-window smoke checks run before and after desktop packaging.
+
+The mixed-helper regression uses Ren'Py's actual official 32-bit `zsync.exe`, downloaded from an immutable source commit and verified with a pinned SHA-256. It is read as data and never executed. The tests verify a 64-bit runtime is selected, helper bytes survive repair/Undo, conflicting Python files still stop before changes, and Python-prefixed platform folders receive the matching runtime.
 
 Local PowerShell 7 checks on Linux use an extraction fixture backed by `cabextract`; those checks exercise the same official payloads and repair transactions but do not establish Windows PowerShell or Windows 8.1 behaviour. The Windows release gate supplies the native Windows checks. Consult the completed workflow before reporting a CI result.
 

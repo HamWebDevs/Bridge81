@@ -79,6 +79,49 @@ function Copy-BridgeAtomic([string]$Source, [string]$Destination) {
     }
 }
 
+function Test-BridgeHelperNeedsCrt([string]$Path) {
+    # A bounded, conservative string check, not a complete dependency resolver.
+    # Opposite-architecture helpers using the OS msvcrt.dll do not consume UCRT.
+    Assert-BridgeRegularPath $Path
+    $length = (Get-Item -LiteralPath $Path).Length
+    if ($length -gt 16777216) { throw 'An opposite-architecture helper is too large to verify safely. No game files have been changed.' }
+    $text = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($Path))
+    return [regex]::IsMatch($text, '(?i)(ucrtbase|vcruntime14[0-9_]*|msvcp14[0-9_]*)\.dll|api-ms-win-(crt|core)-[a-z0-9-]+\.dll')
+}
+
+function Get-BridgeEngineArchitecture([IO.DirectoryInfo]$Directory, [string]$GameExecutableName) {
+    Assert-BridgeRegularPath $Directory.FullName
+    $files = @(Get-ChildItem -LiteralPath $Directory.FullName -File -Force)
+    if ($files.Count -gt 1024) { throw 'Too many files in a Windows engine folder.' }
+    $executables = @($files | Where-Object { $_.Extension -ieq '.exe' })
+    if ($executables.Count -gt 32) { throw 'Too many engine executables.' }
+    $engineNames = @($GameExecutableName, 'python.exe', 'pythonw.exe', 'renpy.exe')
+    $engineExecutables = @($executables | Where-Object { $_.Name -in $engineNames })
+    $pythonDlls = @($files | Where-Object { $_.Name -match '^((lib)?python\d{1,3}(\.\d+)?(_d)?|librenpython)\.dll$' })
+    # Prefer actual engine entry points and Python DLLs over updater/helper EXEs.
+    $runtimeFiles = @($engineExecutables) + @($pythonDlls)
+    if ($runtimeFiles.Count -eq 0) { $runtimeFiles = $executables }
+    $architectures = @{}
+    foreach ($runtime in $runtimeFiles) {
+        $pe = Get-BridgePe $runtime.FullName
+        if ($pe.Subsystem -gt [Version]'6.3') { throw 'An engine runtime declares a Windows version newer than 8.1.' }
+        $architectures[$pe.Architecture] = $true
+    }
+    if ($architectures.Count -gt 1) {
+        throw ('Game/Python engine files disagree on architecture in lib/' + $Directory.Name + '. No files were changed; the engine files need to match.')
+    }
+    if ($architectures.Count -eq 0) { return $null }
+    $architecture = @($architectures.Keys)[0]
+    foreach ($helper in $executables) {
+        if ($helper.Name -in $engineNames) { continue }
+        $helperPe = Get-BridgePe $helper.FullName
+        if ($helperPe.Architecture -ne $architecture -and (Test-BridgeHelperNeedsCrt $helper.FullName)) {
+            throw ('Helper ' + $helper.Name + ' in lib/' + $Directory.Name + ' uses a different architecture and references UCRT/Visual C++ DLLs. One runtime set cannot serve both here; no files were changed.')
+        }
+    }
+    return $architecture
+}
+
 function Get-BridgeGameTargets([string]$Executable) {
     $exe = [IO.Path]::GetFullPath($Executable)
     Assert-BridgeRegularPath $exe
@@ -117,19 +160,10 @@ function Get-BridgeGameTargets([string]$Executable) {
         $directories = @(Get-ChildItem -LiteralPath $lib -Directory -Force)
         if ($directories.Count -gt 128) { throw 'Too many lib folders. Use a clean extracted game build.' }
         foreach ($directory in $directories) {
-            if ($directory.Name -notmatch '^(windows[-_](x86_64|amd64|i686|x86)|win[-_](amd64|x86)|win32)$') { continue }
+            if ($directory.Name -notmatch '^(py\d+(\.\d+)*-)?(windows[-_](x86_64|amd64|i686|x86)|win[-_](amd64|x86)|win32)$') { continue }
             Assert-BridgeRegularPath $directory.FullName
-            $executables = @(Get-ChildItem -LiteralPath $directory.FullName -File -Filter '*.exe')
-            if ($executables.Count -gt 32) { throw 'Too many engine executables.' }
-            $architectures = @{}
-            foreach ($engine in $executables) {
-                $enginePe = Get-BridgePe $engine.FullName
-                if ($enginePe.Subsystem -gt [Version]'6.3') { throw 'An engine executable declares a Windows version newer than 8.1.' }
-                $architectures[$enginePe.Architecture] = $true
-            }
-            if ($architectures.Count -gt 1) { throw 'An engine folder mixes 32-bit and 64-bit executables. Restore a clean game build first.' }
-            if ($architectures.Count -eq 1) {
-                $architecture = @($architectures.Keys)[0]
+            $architecture = Get-BridgeEngineArchitecture $directory ([IO.Path]::GetFileName($exe))
+            if ($null -ne $architecture) {
                 if ($architecture -eq 'x86' -or [Environment]::Is64BitOperatingSystem) {
                     $targets += [pscustomobject]@{ Directory = $directory.FullName; Architecture = $architecture }
                 }

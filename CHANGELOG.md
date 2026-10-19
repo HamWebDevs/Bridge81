@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 2026-10-19
+
+- Fix a false architecture conflict when a 32-bit updater/helper sits beside a 64-bit Ren'Py engine.
+- Select the runtime architecture from recognized game/Python entry points and Python DLL headers. Utilities no longer determine the engine architecture.
+- Recognize Python-prefixed platform folders such as `lib/py3-windows-x86_64` and `lib/py2-windows-i686`.
+- Preserve helpers through repair and Undo. Keep blocking actual engine/Python mismatches, and mixed helpers that reference UCRT or Visual C++ 14 DLLs requiring a conflicting runtime set.
+- Add regression checks for both mixed-helper and Python-prefixed layouts.
+
 ## 0.2.0 — 2026-10-19
 
 - Python-free `Repair-RenPy.cmd` and native repair window for missing Microsoft UCRT DLLs.

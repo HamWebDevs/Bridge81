@@ -48,6 +48,38 @@ try {
     $targets = Get-BridgeGameTargets $exe
     Assert-True ($targets.Targets.Count -eq 3) 'root and both RenPy engine architectures found'
     Assert-True ($targets.Targets[2].Architecture -in @('x86', 'x64')) 'engine architecture read from PE'
+    # Real packages may include a 32-bit updater beside the 64-bit Python engine.
+    $engineFolder = Join-Path $root 'lib\windows-x86_64'
+    $helperPath = Join-Path $engineFolder 'zsync.exe'
+    # Actual official Ren'Py updater, pinned to an immutable source commit/hash.
+    # It is inspected as data only; this test never executes the downloaded EXE.
+    $helperUrl = 'https://raw.githubusercontent.com/renpy/renpy-build/ef36e8421b183b0ab730789bc042ff3324f6b737/prebuilt/zsync.exe'
+    $client = New-Object Net.WebClient
+    try { $client.DownloadFile($helperUrl, $helperPath) } finally { $client.Dispose() }
+    Assert-True ((Get-BridgeHash $helperPath) -eq 'dbc39d1d4ddc8c744e7840a294f906920c532adc0dc9e69f7664a91b55b2ff77') 'official RenPy helper checksum'
+    Assert-True ((Get-BridgePe $helperPath).Architecture -eq 'x86') 'official RenPy helper is 32-bit'
+    $helperHash = Get-BridgeHash $helperPath
+    Assert-True ((Get-BridgeEngineArchitecture (Get-Item -LiteralPath $engineFolder) 'Story.exe') -eq 'x64') 'opposite-bitness OS CRT helper does not override engine'
+    $helperBytes = [IO.File]::ReadAllBytes($helperPath)
+    [IO.File]::AppendAllText($helperPath, ' api-ms-win-crt-heap-l1-1-0.dll ')
+    Assert-Throws { Get-BridgeGameTargets $exe } 'One runtime set cannot serve both'
+    [IO.File]::WriteAllBytes($helperPath, $helperBytes)
+    Write-TestPe (Join-Path $engineFolder 'python.exe') 'x86'
+    Assert-Throws { Get-BridgeGameTargets $exe } 'engine files disagree'
+    [IO.File]::Delete((Join-Path $engineFolder 'python.exe'))
+    Write-TestPe (Join-Path $engineFolder 'python312.dll') 'x86'
+    Assert-Throws { Get-BridgeGameTargets $exe } 'engine files disagree'
+    [IO.File]::Delete((Join-Path $engineFolder 'python312.dll'))
+    Write-TestPe (Join-Path $engineFolder 'librenpython.dll') 'x64'
+    [IO.File]::Delete((Join-Path $engineFolder 'Story.exe'))
+    Assert-True ((Get-BridgeEngineArchitecture (Get-Item -LiteralPath $engineFolder) 'Story.exe') -eq 'x64') 'Python runtime DLL identifies engine when helper is the only EXE'
+    Write-TestPe (Join-Path $engineFolder 'Story.exe') 'x64'
+    $prefixed = New-TestGame 'py3-prefixed-layout'
+    Move-Item -LiteralPath (Join-Path $prefixed 'lib\windows-x86_64') -Destination (Join-Path $prefixed 'lib\py3-windows-x86_64')
+    Move-Item -LiteralPath (Join-Path $prefixed 'lib\windows-i686') -Destination (Join-Path $prefixed 'lib\py2-windows-i686')
+    Write-TestPe (Join-Path $prefixed 'lib\py3-windows-x86_64\zsync.exe') 'x86'
+    $prefixedTargets = Get-BridgeGameTargets (Join-Path $prefixed 'Story.exe')
+    Assert-True ($prefixedTargets.Targets.Count -eq 3) 'Python-prefixed platform folders recognized'
     Assert-Throws { Get-BridgePe (Join-Path $root 'renpy\__init__.py') } 'Not a Windows executable'
     [IO.File]::WriteAllText((Join-Path $root 'renpy\vc_version.py'), 'version_tuple = (8, 4, 1)')
     Assert-Throws { Get-BridgeGameTargets $exe } 'requires Windows 10'
@@ -75,6 +107,7 @@ try {
         }
     }
     Assert-True ((Get-BridgeHash $exe) -eq $exeHash) 'launcher bytes unchanged'
+    Assert-True ((Get-BridgeHash $helperPath) -eq $helperHash) 'opposite-architecture helper executable preserved'
     Assert-True ((Get-BridgeHash (Join-Path $root 'game\keep-save.txt')) -eq $saveHash) 'game data unchanged'
     Assert-Throws { Install-BridgeRuntime $exe $catalog $cache } 'previous repair'
     $receipt = Join-Path $root '.bridge81-runtime\receipt.json'
@@ -89,9 +122,18 @@ try {
     [IO.File]::Copy((Join-Path $runtimeFolder 'api-ms-win-crt-heap-l1-1-0.dll'), $modified, $true)
     Undo-BridgeRuntime $root $catalog | Out-Null
     Assert-True ((Get-BridgeHash $original) -eq $originalHash) 'Undo restores original'
+    Assert-True ((Get-BridgeHash $helperPath) -eq $helperHash) 'Undo preserves updater/helper executable'
     Assert-True (-not [IO.File]::Exists($modified)) 'Undo removes added DLL'
     Assert-True (-not [IO.Directory]::Exists((Join-Path $root '.bridge81-runtime'))) 'Undo removes completed receipt'
     Assert-True ((Get-BridgeHash (Join-Path $root 'game\keep-save.txt')) -eq $saveHash) 'Undo preserves game data'
+    $prefixedHelper = Join-Path $prefixed 'lib\py3-windows-x86_64\zsync.exe'
+    $prefixedHelperHash = Get-BridgeHash $prefixedHelper
+    Install-BridgeRuntime (Join-Path $prefixed 'Story.exe') $catalog $cache | Out-Null
+    $prefixedRuntime = Join-Path $prefixed 'lib\py3-windows-x86_64\ucrtbase.dll'
+    Assert-True ((Get-BridgeHash $prefixedRuntime) -eq ($catalog.payloads.x64.files | Where-Object { $_.name -eq 'ucrtbase.dll' }).sha256) 'repair installs the matching runtime in Python-prefixed folders'
+    Undo-BridgeRuntime $prefixed $catalog | Out-Null
+    Assert-True (-not [IO.File]::Exists($prefixedRuntime)) 'Undo removes runtime from Python-prefixed folders'
+    Assert-True ((Get-BridgeHash $prefixedHelper) -eq $prefixedHelperHash) 'Python-prefixed helper survives repair and Undo'
 
     # Browser/offline downloads must work without making a network request.
     $offline = Join-Path $sandbox 'browser downloads'

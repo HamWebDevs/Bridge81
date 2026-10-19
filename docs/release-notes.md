@@ -1,17 +1,19 @@
-# Bridge81 0.2.0 preview - Ren'Py runtime repair
+# Bridge81 0.2.1 preview - mixed-helper repair fix
+
+Fixes the false **"An engine folder mixes 32-bit and 64-bit executables"** error when a game includes an updater/helper built for a different architecture. The repair now identifies the actual game/Python runtime first. It also recognizes `py2-` and `py3-` Windows platform folders. Helpers stay in place, and real engine/runtime conflicts still stop before changes.
 
 A Python-free repair utility for missing `api-ms-win-crt-heap-l1-1-0.dll` and related Microsoft Universal C Runtime errors on older Windows installations.
 
 ## Download for the missing DLL error
 
-Choose **Bridge81-0.2.0-runtime-repair.zip**, extract the entire ZIP, then double-click **Repair-RenPy.cmd**. Choose your main game EXE and click **Repair runtime**. Launch the game normally afterwards. No Python or administrator access is needed for the repair window.
+Choose **Bridge81-0.2.1-runtime-repair.zip**, extract the entire ZIP, then double-click **Repair-RenPy.cmd**. Choose your main game EXE and click **Repair runtime**. Launch the game normally afterwards. No Python or administrator access is needed for the repair window.
 
-The utility downloads Microsoft's SDK 14393.795 runtime directly, checks cabinet and individual-DLL SHA-256 hashes, and adds the complete 41-file set beside each recognized executable. It matches 32-bit and 64-bit launcher/engine folders separately. Existing runtime files are backed up for **Undo repair**; later edits are preserved by refusing an unsafe Undo. Write failures attempt rollback. Offline/browser-downloaded Microsoft cabinets are supported when Windows' TLS or certificates prevent downloading.
+The utility downloads Microsoft's SDK 14393.795 runtime directly, checks cabinet and individual-DLL SHA-256 hashes, and adds the complete 41-file set beside each recognized engine. It matches 32-bit and 64-bit launcher/engine folders separately. Existing runtime files are backed up for **Undo repair**; later edits are preserved by refusing an unsafe Undo. Write failures attempt rollback. Offline/browser-downloaded Microsoft cabinets are supported when Windows' TLS or certificates prevent downloading. Existing 0.2.0 repair receipts remain compatible with Undo.
 
 ## Other downloads
 
-- **Bridge81-0.2.0-source.zip**: the full project, Python-free repair, optional verified Python setup, examples and documentation. Open `Start-Bridge81.cmd` for the workbench or `Repair-RenPy.cmd` for runtime repair.
-- **Bridge81-0.2.0-windows-x64-preview.zip**: standalone native workbench plus the independent repair launcher. Extract the whole folder. The workbench still needs a working UCRT to start; the repair launcher does not depend on its Python runtime.
+- **Bridge81-0.2.1-source.zip**: the full project, Python-free repair, optional verified Python setup, examples and documentation. Open `Start-Bridge81.cmd` for the workbench or `Repair-RenPy.cmd` for runtime repair.
+- **Bridge81-0.2.1-windows-x64-preview.zip**: standalone native workbench plus the independent repair launcher. Extract the whole folder. The workbench still needs a working UCRT to start; the repair launcher does not depend on its Python runtime.
 - **Wheel / sdist**: Python CLI/package for developers. Use a complete ZIP for the independent repair launcher and its external resources.
 - **SHA256SUMS** covers the five downloadable build files.
 
