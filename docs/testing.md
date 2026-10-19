@@ -20,7 +20,7 @@ The unit/integration suite exercises real Python execution, exact arguments with
 
 Completed locally on a Linux development host with Python 3.12.14:
 
-- **62 unit/integration tests passed** for 0.3.0, including malformed PE images, direct/delay imports, bounded sparse-file reads and bundle evidence.
+- **63 unit/integration tests passed** for 0.3.0, including malformed PE images, direct/delay imports, bounded sparse-file reads, bundle evidence and both Markdown report commands.
 - **Native Tk GUI smoke passed:** widget creation, exact-argument preview, a background script run, game/DLL inspection and launch preview.
 - **Desktop layout reviewed at 1000×660**, within a 1366×768 virtual display. The host's bitmap-font fallback is not representative of Windows' Segoe UI rendering.
 - **Wheel and source distribution built**, with the installed wheel's CLI checked outside the source tree.

@@ -72,9 +72,9 @@ def main(argv: list[str] | None = None) -> int:
             print(report_markdown(report) if options.format == "markdown" else json.dumps(report.as_dict(), indent=2))
             return 2 if report.status == "blocked" else 0
         if options.command == "dependencies":
-            from .dependencies import inspect_dependencies, report_markdown
+            from .dependencies import inspect_dependencies, report_markdown as dependency_markdown
             report = inspect_dependencies(options.folder, exe=options.exe, target=options.target)
-            print(report_markdown(report) if options.format == "markdown" else json.dumps(report, indent=2))
+            print(dependency_markdown(report) if options.format == "markdown" else json.dumps(report, indent=2))
             return 1 if report['summary']['unreadable_modules'] else 0
         args = arguments(options.args_json)
         if options.kind == "python":

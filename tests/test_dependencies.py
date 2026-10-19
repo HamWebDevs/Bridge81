@@ -85,6 +85,14 @@ class DependencyTests(unittest.TestCase):
         self.assertIn('provided by Windows',report['interpretation'])
         self.assertNotIn(str(self.root),json.dumps(report))
 
+    def test_existing_game_markdown_and_new_dependency_markdown_both_work(self):
+        for command, expected in (('game', 'Bridge81 game report'), ('dependencies', 'Bridge81 DLL evidence')):
+            out=io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code=main([command,str(self.root),'--format','markdown'])
+            self.assertEqual(code,0)
+            self.assertIn(expected,out.getvalue())
+
     def test_bundled_wrong_architecture_is_evidence_and_bytes_stay_unchanged(self):
         dll=import_pe(self.root/'ucrtbase.dll',(),bits=32);before=dll.read_bytes()
         report=inspect_dependencies(self.root)
