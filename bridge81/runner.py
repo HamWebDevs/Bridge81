@@ -63,7 +63,10 @@ def external_dll_search():
             kernel.SetDllDirectoryW(str(sys._MEIPASS))
 
 
-def _stop(process: subprocess.Popen) -> None:
+def _stop(process: subprocess.Popen, job=None) -> None:
+    if job is not None:
+        job.terminate()
+        return
     if os.name == "nt":
         # Built into Windows 8.1; argv is numeric and never passed through cmd.exe.
         system = Path(os.environ.get("SystemRoot", "C:/Windows"))
@@ -96,13 +99,27 @@ def run(plan: Plan, *, timeout: float = 120, cancel: threading.Event | None = No
     if not plan.argv or not Path(plan.argv[0]).is_absolute() or not Path(plan.cwd).is_dir():
         raise BridgeError("Execution requires an absolute interpreter path and an existing working directory.")
     started = time.monotonic()
-    options = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {"start_new_session": True}
+    job = None
+    process = None
+    if os.name == "nt":
+        from .winjob import CREATE_SUSPENDED, WindowsJob
+        job = WindowsJob()
+        options = {"creationflags": subprocess.CREATE_NO_WINDOW | CREATE_SUSPENDED}
+    else:
+        options = {"start_new_session": True}
     try:
         with external_dll_search():
             process = subprocess.Popen(plan.argv, cwd=plan.cwd, env=child_environment(plan.env),
                                        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                        shell=False, **options)
-    except OSError as exc:
+        if job is not None:
+            job.attach_and_resume(process.pid)
+    except (OSError, BridgeError) as exc:
+        if process is not None and process.poll() is None:
+            process.kill()
+            process.wait(timeout=7)
+        if job is not None:
+            job.close()
         raise BridgeError("Could not start the process: %s" % exc) from exc
     captured = bytearray()
     overflow = threading.Event()
@@ -140,14 +157,16 @@ def run(plan: Plan, *, timeout: float = 120, cancel: threading.Event | None = No
             else:
                 time.sleep(0.02)
                 continue
-            _stop(process)
+            _stop(process, job)
             break
         process.wait(timeout=7)
     except BaseException:
-        _stop(process)
+        _stop(process, job)
         process.wait(timeout=7)
         raise
     finally:
+        if job is not None:
+            job.close()
         reader.join(timeout=1)
         if finished.is_set() and process.stdout is not None:
             process.stdout.close()

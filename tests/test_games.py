@@ -12,7 +12,7 @@ class GameTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="bridge81 games ")
         self.addCleanup(self.tmp.cleanup)
-        self.parent = Path(self.tmp.name)
+        self.parent = Path(self.tmp.name).resolve()
         self.root = game(self.parent / "A Story")
 
     def test_older_game_is_unverified_not_a_false_pass(self):

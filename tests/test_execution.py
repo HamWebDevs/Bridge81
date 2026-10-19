@@ -22,7 +22,7 @@ class ExecutionTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="Bridge81 path with spaces ")
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
+        self.root = Path(self.tmp.name).resolve()
 
     def script(self, body, name="example.py"):
         source = self.root / name
