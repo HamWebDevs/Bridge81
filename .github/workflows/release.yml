@@ -1,0 +1,42 @@
+name: Preview release
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/release.yml
+      - scripts/publish_preview.py
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: preview-release
+  cancel-in-progress: false
+jobs:
+  verify:
+    uses: ./.github/workflows/checks.yml
+  desktop:
+    needs: verify
+    uses: ./.github/workflows/windows-build.yml
+  publish:
+    needs: [verify, desktop]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: bridge81-source-and-python-distributions
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: Bridge81-0.1.0-windows-x64-preview
+          path: desktop/Bridge81
+      - name: Publish a prerelease with verified build outputs
+        run: python scripts/publish_preview.py
+        env:
+          GH_TOKEN: ${{ github.token }}

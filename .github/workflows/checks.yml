@@ -1,5 +1,9 @@
 name: Checks
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 jobs:
@@ -67,3 +71,23 @@ jobs:
         with:
           name: bridge81-source-and-python-distributions
           path: dist/*
+  cygwin:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
+      - name: Install official Cygwin for integration testing
+        shell: powershell
+        run: |
+          $setup = Join-Path $env:RUNNER_TEMP 'cygwin-setup.exe'
+          $root = Join-Path $env:RUNNER_TEMP 'bridge81-cygwin'
+          $cache = Join-Path $env:RUNNER_TEMP 'bridge81-cygwin-cache'
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://cygwin.com/setup-x86_64.exe' -OutFile $setup
+          $setupArgs = @('--quiet-mode', '--no-admin', '--root', ('"{0}"' -f $root), '--local-package-dir', ('"{0}"' -f $cache), '--site', 'https://mirrors.kernel.org/sourceware/cygwin/', '--packages', 'bash,coreutils')
+          $process = Start-Process -FilePath $setup -ArgumentList $setupArgs -PassThru -Wait
+          if ($process.ExitCode -ne 0) { throw ('Cygwin setup failed: ' + $process.ExitCode) }
+          "BRIDGE81_TEST_CYGWIN=$root\bin\bash.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - run: python tests/cygwin_smoke.py

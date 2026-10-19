@@ -4,7 +4,7 @@
 
 Bridge81 is a small, local desktop app for giving an older Windows laptop a few more useful jobs. Run Python scripts in project environments, use Bash through Cygwin, and investigate why an older Ren'Py game will not start.
 
-**0.1.0 preview.** Windows 8.1 is the target, not a verified compatibility claim. Core checks and runners are tested on a Linux development host. Windows CI and packaging workflows are included; real Windows 8.1, Cygwin and GPU validation are still needed. See [testing status](docs/testing.md).
+**0.1.0 preview.** Windows 8.1 is the target, not a verified compatibility claim. Core tests and native GUI smoke checks pass on modern Windows and Linux. Actual Windows 8.1 hardware and GPU validation are still needed. See [testing status](docs/testing.md).
 
 ## Start on Windows 8.1
 
@@ -22,6 +22,8 @@ python run_bridge81.py
 Use the traditional **Python 3.12** installer for the documented Windows 8.1 baseline. The supplied x64 setup pins **3.12.10**, the last full 3.12 maintenance installer. Later 3.12 security releases are source-only; this is a legacy compatibility choice, not the latest security release. The Microsoft Store package and current Python install manager are not the Windows 8.1 installation route.
 
 [Windows setup and troubleshooting](docs/windows81.md) · [Game compatibility](docs/games.md) · [Contributing](CONTRIBUTING.md)
+
+[Download the 0.1.0 preview](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.1.0) for the complete source ZIP or optional standalone x64 workbench. Read the release's compatibility status before choosing a build.
 
 ## What you can do
 

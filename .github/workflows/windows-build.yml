@@ -1,6 +1,8 @@
 name: Windows desktop build
 # Explicit preview builds only; never publishes or claims Windows 8.1 certification.
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 jobs:

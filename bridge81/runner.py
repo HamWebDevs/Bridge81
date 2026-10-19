@@ -42,6 +42,8 @@ def child_environment(changes: dict[str, str]) -> dict[str, str]:
             env.pop("LD_LIBRARY_PATH", None)
         else:
             env["LD_LIBRARY_PATH"] = original
+    if getattr(sys, "frozen", False):
+        env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
     env.update(changes)
     return env
 

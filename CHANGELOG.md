@@ -7,6 +7,7 @@ Initial preview:
 - Native Tk desktop workbench and shared command-line interface.
 - Explicit Python and Cygwin Bash script plans with separate arguments.
 - New virtual environments, bounded captured output, timeouts and cancellation.
+- Windows scripts start suspended and join a cleanup Job Object before execution; descendants remain owned when a parent exits.
 - Bounded Ren'Py metadata and PE header inspection with conservative blockers.
 - Temporary low-memory, windowed, no-audio and no-joystick profiles.
 - Privacy-conscious game report exports.

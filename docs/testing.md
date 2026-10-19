@@ -14,7 +14,9 @@ Completed locally on a Linux development host with Python 3.12.14:
 - **Wheel and source distribution built**, with the installed wheel's CLI checked outside the source tree.
 - **Official Python installer SHA-256 checked** against the actual downloaded installer, not just copied metadata.
 
-Windows and Linux workflows are included for the new GitHub repository. Workflow configuration is not a completed CI result. The PowerShell installer and Windows-only execution paths have not been run on Windows here.
+GitHub validation on commit `994e057aad9d1d0afce447b74b58ae8b04252813` passed all **9 jobs**: core tests on Windows/Linux with Python 3.10, 3.12.10 and 3.13; native GUI smoke on both hosts; and distribution builds. Windows also passed the source launcher and PowerShell setup parser checks. The Windows core run includes Job Object cleanup after a parent process exits and canonical handling of short/long path aliases.
+
+A dedicated real-Cygwin smoke job and a standalone Windows build are part of the preview release gate. Do not treat their configuration as a result; consult the completed release workflow. The Python installer has been checksum-checked but has not been executed by CI or on Windows 8.1.
 
 ## Windows 8.1 device checklist — pending
 
