@@ -30,6 +30,17 @@ For `api-ms-win-crt-*.dll` or `ucrtbase.dll` errors, use **Games → Repair miss
 
 Unknown engines require an explicit trust override. That override does not bypass a recognized OS, header or architecture blocker. Use only trusted game builds: running one grants it your normal user permissions.
 
+## Mixed 32-bit and 64-bit executables
+
+If Bridge81 refuses a game because an engine folder mixes x86 and x64 executables, it has found inconsistent architecture evidence. This is a **protective stop**, not proof that every file in the folder is broken. Some complete game distributions bundle separate platform helpers, while manually mixed or partly overwritten installs can also create this situation. The inspector cannot safely guess which of these applies.
+
+1. Confirm the game's selected main `.exe` and use **Inspect game** or `bridge81 dependencies <folder> --exe <game.exe>` to collect read-only architecture evidence.
+2. Compare the installation with a clean, unmodified download from the game's publisher. Check that the correct **Windows** edition was extracted completely; avoid merging builds or replacing a single `renpy`, `lib` or `python` folder with one from another version.
+3. If the publisher supplies a clear x86/x64 launch choice, select its matching launcher. Do not rename a 32-bit executable to bypass an architecture gate, mix DLLs from random web sites or turn off checksum verification.
+4. If the clean build still triggers a mixed-engine stop, preserve the read-only report and ask the game developer to confirm its supported layout. A future scoped compatibility rule needs reproducible evidence rather than a blanket override.
+
+The repair does not install DirectX, OpenGL drivers, GPU capabilities or new Ren'Py engine binaries. An x64 computer can run many x86 programs, but **a single process cannot load a DLL of the wrong architecture**.
+
 ## Graphics issues
 
 Hold Shift while starting Ren'Py, or press Shift+G after it starts, to open the built-in Graphics Acceleration menu. Try GL or ANGLE using the choices that the game actually offers. Classic renderers are not suitable for every model-based game and were removed in Ren'Py 8.4. Old software-renderer instructions do not provide a universal fallback.

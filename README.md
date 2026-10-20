@@ -2,7 +2,7 @@
 
 **Python. Unix tools. Older games. A useful workbench for Windows 8.1.**
 
-Bridge81 is a small, local desktop app for giving an older Windows laptop a few more useful jobs. Run Python scripts in project environments, use Bash through Cygwin, and investigate why an older Ren'Py game will not start.
+Bridge81 is a lightweight **Windows 8.1 compatibility workbench** for Python scripts, Cygwin Bash and older Ren'Py games. Diagnose engine and DLL blockers, try reversible troubleshooting profiles, and repair verified missing Microsoft UCRT runtime files without running a modern browser or signing up for a service.
 
 **0.3.0 preview.** Windows 8.1 is the target, not a verified compatibility claim. Core tests and native GUI smoke checks run on modern Windows and Linux. Actual Windows 8.1 hardware and GPU validation are still needed. See [testing status](docs/testing.md).
 
@@ -27,7 +27,7 @@ python run_bridge81.py
 
 Use the traditional **Python 3.12** installer for the documented Windows 8.1 baseline. The supplied x64 setup pins **3.12.10**, the last full 3.12 maintenance installer. Later 3.12 security releases are source-only; this is a legacy compatibility choice, not the latest security release. The Microsoft Store package and current Python install manager are not the Windows 8.1 installation route.
 
-[Windows setup and troubleshooting](docs/windows81.md) · [Game compatibility](docs/games.md) · [Contributing](CONTRIBUTING.md)
+[Windows setup and troubleshooting](docs/windows81.md) · [Game compatibility](docs/games.md) · [GitHub discovery guidance](docs/discoverability.md) · [Contributing](CONTRIBUTING.md)
 
 [Download the 0.3.0 preview](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.3.0) for the small runtime repair, complete source ZIP or optional standalone x64 workbench. Read the release's compatibility status before choosing a build.
 
@@ -56,6 +56,8 @@ Cygwin provides Unix tools compiled for Windows. It does **not** run arbitrary L
 ## Ren'Py compatibility, honestly
 
 Choose a complete, extracted Windows game build in **Games**, then select its `.exe` and click **Inspect game**. Inspection never imports the game's Python files. Reports stay **unverified** unless a known blocker is found; a PE header cannot reveal every DLL, CPU instruction or graphics requirement.
+
+If a repair reports **mixed 32-bit and 64-bit engine executables**, stop and inspect the [architecture troubleshooting guide](docs/games.md#mixed-32-bit-and-64-bit-executables). Bridge81 deliberately does not copy runtime files into an ambiguous engine layout; patching the wrong executable could hide the real incompatibility.
 
 Ren'Py **8.4 and newer require Windows 10**. Bridge81 blocks those builds for its Windows 8.1 target, including when conflicting metadata mentions a newer engine. Older engines can still fail because of drivers, game-specific code or dependencies. The explicit UCRT repair is limited to Microsoft's cataloged runtime files; swapping a game's engine, Python or graphics libraries is outside its scope.
 
