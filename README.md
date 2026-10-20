@@ -4,11 +4,11 @@
 
 Bridge81 is a lightweight **Windows 8.1 compatibility workbench** for Python scripts, Cygwin Bash and older Ren'Py games. Diagnose engine and DLL blockers, try reversible troubleshooting profiles, and repair verified missing Microsoft UCRT runtime files without running a modern browser or signing up for a service.
 
-**0.3.0 preview.** Windows 8.1 is the target, not a verified compatibility claim. Core tests and native GUI smoke checks run on modern Windows and Linux. Actual Windows 8.1 hardware and GPU validation are still needed. See [testing status](docs/testing.md).
+**0.4.0 preview.** Windows 8.1 is the target, not a verified compatibility claim. Core tests and native GUI smoke checks run on modern Windows and Linux. Actual Windows 8.1 hardware and GPU validation are still needed. See [testing status](docs/testing.md).
 
 ## Game says a runtime DLL is missing?
 
-Download [**Bridge81-0.3.0-runtime-repair.zip**](https://github.com/HamWebDevs/Bridge81/releases/download/v0.3.0/Bridge81-0.3.0-runtime-repair.zip), extract the whole ZIP, and open **Repair-RenPy.cmd**. Choose the game's main EXE and click **Repair runtime**. It uses Windows' built-in tools and opens even when a missing UCRT stops Python or the main workbench from starting.
+Download [**Bridge81-0.4.0-runtime-repair.zip**](https://github.com/HamWebDevs/Bridge81/releases/download/v0.4.0/Bridge81-0.4.0-runtime-repair.zip), extract the whole ZIP, and open **Repair-RenPy.cmd**. Choose the game's main EXE and click **Repair runtime**. It uses Windows' built-in tools and opens even when a missing UCRT stops Python or the main workbench from starting.
 
 The repair downloads Microsoft's complete matching UCRT set, verifies its checksums, places it beside the launcher and recognized engine executables, and provides **Undo** with original-file backups. It targets errors such as `api-ms-win-crt-heap-l1-1-0.dll is missing`; other game requirements still apply. [Repair details and offline downloads](docs/runtime-repair.md).
 
@@ -29,7 +29,7 @@ Use the traditional **Python 3.12** installer for the documented Windows 8.1 bas
 
 [Windows setup and troubleshooting](docs/windows81.md) · [Game compatibility](docs/games.md) · [GitHub discovery guidance](docs/discoverability.md) · [Contributing](CONTRIBUTING.md)
 
-[Download the 0.3.0 preview](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.3.0) for the small runtime repair, complete source ZIP or optional standalone x64 workbench. Read the release's compatibility status before choosing a build.
+[Download the 0.4.0 preview](https://github.com/HamWebDevs/Bridge81/releases/tag/v0.4.0) for the small runtime repair, complete source ZIP or optional standalone x64 workbench. Read the release's compatibility status before choosing a build.
 
 ## What you can do
 
@@ -38,6 +38,7 @@ Use the traditional **Python 3.12** installer for the documented Windows 8.1 bas
 | Python projects | Choose an interpreter, working folder and exact arguments; create a new venv; capture output; cancel or set a timeout. |
 | Unix scripts | Run `.sh` scripts with an installed Cygwin Bash, including paths with spaces and positional arguments. |
 | Older Ren'Py games | Read engine metadata and PE headers; flag known OS/architecture blockers; export a report without absolute paths or dialogue. |
+| Saved error hints | Read saved loader/import/graphics errors without returning raw logs; [CLI and plugin](docs/runtime-log.md). |
 | DLL evidence | Inspect direct/delay imports and bundled architectures without running the game; [CLI and DevPocket plugin](docs/dependencies.md). |
 | Missing UCRT DLLs | Separate Python-free runtime repair; verified Microsoft files, architecture matching, original-file backups and Undo. |
 | Troubleshooting | Apply temporary low-memory, windowed, no-audio or no-joystick settings to a selected game launch. |

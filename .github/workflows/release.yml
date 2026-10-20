@@ -36,7 +36,7 @@ jobs:
           path: dist
       - uses: actions/download-artifact@v4
         with:
-          name: Bridge81-0.3.0-windows-x64-preview
+          name: Bridge81-0.4.0-windows-x64-preview
           path: desktop/Bridge81
       - name: Publish a prerelease with verified build outputs
         run: python scripts/publish_preview.py

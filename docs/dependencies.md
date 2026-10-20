@@ -32,6 +32,8 @@ CLI status **0** means inspection completed, including warnings and unknown syst
 
 ## Connect to DevPocket
 
+The separate [runtime-log tool and plugin](runtime-log.md) can interpret common saved loader/import/graphics error hints while withholding raw log lines. Use its evidence alongside DLL metadata; neither is a Windows-loader simulation.
+
 Install Bridge81 and DevPocket 1.x in the same Python environment. Standalone Bridge81 does not require DevPocket:
 
 ```console

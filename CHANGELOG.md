@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-10-21
+
+- Add `bridge81 runtime-log` for saved Windows/Ren'Py log hints: missing modules/procedures, invalid images, UCRT/Visual C++ mentions, Python import failures and graphics-context errors.
+- Return fixed explanations, cautious next steps and line counts/locations while withholding raw lines and private paths. Pattern matches are hints, not root-cause or compatibility claims.
+- Add the optional read-only `bridge81-runtime-log` DevPocket API v1 plugin for project checks, SARIF and explicit MCP exposure. No launch, repair, downloader or automatic upload is exposed.
+- Bound regular UTF-8 inputs to 2 MiB/30,000 lines; reject symlinks, special files and observed mutations. Include privacy/CLI and installed-plugin regression checks.
+- Retain the existing DLL inspector, reversible runtime repair and Windows 8.1 preview status.
+
 ## 0.3.0 — 2026-10-19
 
 - Add bounded PE direct/delay-import inspection, a Games-tab **Inspect DLLs** action and JSON/Markdown CLI reports.

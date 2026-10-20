@@ -31,6 +31,6 @@ jobs:
         run: ./dist/Bridge81/scripts/Repair-RenPy.ps1 -SmokeTest
       - uses: actions/upload-artifact@v4
         with:
-          name: Bridge81-0.3.0-windows-x64-preview
+          name: Bridge81-0.4.0-windows-x64-preview
           path: dist/Bridge81
           if-no-files-found: error
