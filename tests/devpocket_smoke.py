@@ -23,6 +23,16 @@ def main():
         import_pe(story / 'Story.exe', imports=('KERNEL32.dll', 'api-ms-win-crt-heap-l1-1-0.dll'))
         inventory = json.loads(command(['plugins', 'list', '--json'], root))
         assert any(p['name'] == 'bridge81-game' and not p['enabled'] for p in inventory)
+        assert any(p['name'] == 'bridge81-runtime-log' and not p['enabled'] for p in inventory)
+        (root / 'runtime.txt').write_text('WinError 126\nC:\\Users\\PRIVATE_USER\\private.py\npassword=PRIVATE_SECRET', encoding='utf-8')
+        log_payload = json.dumps({'log': 'runtime.txt'})
+        command(['run', 'bridge81-runtime-log', '--input', log_payload], root, expected=2)
+        command(['plugins', 'enable', 'bridge81-runtime-log'], root)
+        log_report = json.loads(command(['run', 'bridge81-runtime-log', '--input', log_payload, '--format', 'json'], root, expected=1))
+        assert log_report['data']['status'] == 'hints-found'
+        assert 'PRIVATE_' not in json.dumps(log_report)
+        log_sarif = json.loads(command(['run', 'bridge81-runtime-log', '--input', log_payload, '--format', 'sarif'], root, expected=1))
+        assert log_sarif['runs'][0]['results'][0]['locations'][0]['physicalLocation']['region']['startLine'] == 1
         payload = json.dumps({'folder': 'Story'})
         command(['run', 'bridge81-game', '--input', payload], root, expected=2)
         command(['plugins', 'enable', 'bridge81-game'], root)
@@ -47,13 +57,17 @@ def main():
             'protocolVersion': '2025-11-25', 'capabilities': {}, 'clientInfo': {'name': 'bridge81-test', 'version': '1'}}},
             {'jsonrpc': '2.0', 'method': 'notifications/initialized'},
             {'jsonrpc': '2.0', 'id': 2, 'method': 'tools/list'},
-            {'jsonrpc': '2.0', 'id': 3, 'method': 'tools/call', 'params': {'name': 'bridge81-game', 'arguments': {'folder': 'Story'}}}]
-        replies = {x['id']: x for x in map(json.loads, command(['serve', '--root', root, '--plugin', 'bridge81-game'], root,
+            {'jsonrpc': '2.0', 'id': 3, 'method': 'tools/call', 'params': {'name': 'bridge81-game', 'arguments': {'folder': 'Story'}}},
+            {'jsonrpc': '2.0', 'id': 4, 'method': 'tools/call', 'params': {'name': 'bridge81-runtime-log', 'arguments': {'log': 'runtime.txt'}}}]
+        replies = {x['id']: x for x in map(json.loads, command(['serve', '--root', root, '--plugin', 'bridge81-game', '--plugin', 'bridge81-runtime-log'], root,
                     input=''.join(json.dumps(m) + '\n' for m in messages)).splitlines())}
         advertised = next(t for t in replies[2]['result']['tools'] if t['name'] == 'bridge81-game')
         assert advertised['annotations']['readOnlyHint'] is True
         assert not replies[3]['result']['isError']
         assert replies[3]['result']['structuredContent']['data']['dependencies']['summary']['imports'] == 1
+        assert not replies[4]['result']['isError']
+        assert replies[4]['result']['structuredContent']['data']['status'] == 'hints-found'
+        assert 'PRIVATE_' not in json.dumps(replies[4])
 
         # A known OS blocker is an operational outcome, even with suppression.
         (story / 'renpy/__init__.py').write_text("version_tuple = (8, 4, 0)\nraise RuntimeError('MUST NOT EXECUTE')\n")

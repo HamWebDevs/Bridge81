@@ -41,6 +41,9 @@ def parser() -> argparse.ArgumentParser:
     dependencies.add_argument("--exe", help="Executable relative to the extracted game folder.")
     dependencies.add_argument("--target", choices=("x86", "x64"), default="x64")
     dependencies.add_argument("--format", choices=("json", "markdown"), default="json")
+    runtime_log = commands.add_parser("runtime-log", help="Read saved loader/import/graphics errors with log content withheld.")
+    runtime_log.add_argument("path", help="Saved UTF-8 log.txt or traceback.txt; never executed.")
+    runtime_log.add_argument("--format", choices=("json", "markdown"), default="json")
     for mode in ("plan", "run"):
         command = commands.add_parser(mode, help="Preview a command." if mode == "plan" else "Execute a selected script, create a venv, or launch a game.")
         command.add_argument("kind", choices=("python", "bash", "venv", "renpy"))
@@ -76,6 +79,11 @@ def main(argv: list[str] | None = None) -> int:
             report = inspect_dependencies(options.folder, exe=options.exe, target=options.target)
             print(dependency_markdown(report) if options.format == "markdown" else json.dumps(report, indent=2))
             return 1 if report['summary']['unreadable_modules'] else 0
+        if options.command == "runtime-log":
+            from .runtime_log import load, report_markdown as log_markdown
+            report = load(options.path)
+            print(log_markdown(report) if options.format == "markdown" else json.dumps(report, indent=2))
+            return int(bool(report["findings"]))
         args = arguments(options.args_json)
         if options.kind == "python":
             plan = python_plan(options.path, args, python=options.python, cwd=options.cwd)

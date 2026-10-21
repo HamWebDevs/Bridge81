@@ -27,3 +27,27 @@ def inspect(context, params):
 def build_tool():
     from devpocket.sdk import ToolSpec
     return ToolSpec(name='bridge81-game', description='Inspect RenPy engine metadata, PE headers and DLL imports without executing or repairing the game', input_schema={'type': 'object', 'properties': {'folder': {'type': 'string', 'minLength': 1, 'maxLength': 4096}, 'exe': {'type': 'string', 'maxLength': 1024}, 'target': {'type': 'string', 'enum': ['x86', 'x64']}, 'dependencies': {'type': 'boolean'}}, 'required': ['folder'], 'additionalProperties': False}, run=inspect, read_only=True, api_version=1)
+
+
+def inspect_runtime_log(context, params):
+    from devpocket.sdk import Finding, ToolResult
+    from .runtime_log import load
+    requested = context.root / params['log']
+    if requested.is_symlink():
+        raise ValueError('Runtime log cannot be a symlink')
+    path = context.resolve(params['log'])
+    # Check the lexical path too, before resolve can erase an internal link.
+    for parent in requested.parents:
+        if parent == context.root:
+            break
+        if parent.is_symlink():
+            raise ValueError('Runtime log cannot use symlinked directories')
+    report = load(path)
+    relative = path.relative_to(context.root).as_posix()
+    findings = [Finding(item['code'], item['message'], path=relative, line=item['first_line'], help=item['action']) for item in report['findings']]
+    return ToolResult('Saved runtime-log hints: ' + report['status'], findings, report)
+
+
+def build_runtime_log_tool():
+    from devpocket.sdk import ToolSpec
+    return ToolSpec(name='bridge81-runtime-log', description='Classify saved Windows loader, import and graphics error hints while withholding log lines and private paths', input_schema={'type': 'object', 'properties': {'log': {'type': 'string', 'minLength': 1, 'maxLength': 4096}}, 'required': ['log'], 'additionalProperties': False}, run=inspect_runtime_log, read_only=True, api_version=1)

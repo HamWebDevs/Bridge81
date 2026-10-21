@@ -1,19 +1,23 @@
-# Bridge81 0.3.0 preview — DLL evidence and developer integration
+# Bridge81 0.4.0 preview — private runtime-log hints
 
 Investigate native game dependencies without running the game. **Inspect DLLs** and `bridge81 dependencies` read bounded direct/delay-import tables, classify runtime/API-set imports and show bundled architecture evidence. System availability stays unknown; this does not simulate the Windows loader or promise compatibility.
 
 The optional `bridge81-game` DevPocket API v1 plugin connects inspection to structured checks, SARIF and explicitly exposed MCP tools. It cannot launch, repair or download. Known blockers remain operational failures under findings suppression. [Usage and limits](https://github.com/HamWebDevs/Bridge81/blob/main/docs/dependencies.md).
 
+## New saved-log tool and plugin
+
+`bridge81 runtime-log` recognises common Windows loader, Python import and graphics-context error patterns in saved UTF-8 logs. It returns fixed explanations and line numbers while withholding raw text and private paths. The optional `bridge81-runtime-log` plugin connects the same evidence to DevPocket checks, SARIF and explicit MCP exposure. It executes no game code or repairs and makes no root-cause/compatibility claim. [Usage and limits](https://github.com/HamWebDevs/Bridge81/blob/main/docs/runtime-log.md).
+
 ## Missing UCRT error
 
-Choose **Bridge81-0.3.0-runtime-repair.zip**, extract the entire ZIP and open **Repair-RenPy.cmd**. Choose the main game EXE and click **Repair runtime**. The independent repair window needs no Python or administrator access.
+Choose **Bridge81-0.4.0-runtime-repair.zip**, extract the entire ZIP and open **Repair-RenPy.cmd**. Choose the main game EXE and click **Repair runtime**. The independent repair window needs no Python or administrator access.
 
 The retained repair downloads Microsoft's SDK 14393.795 runtime, checks cabinet and individual-file SHA-256 hashes and adds the complete 41-file matching set beside recognized launchers/engines. Original-file backups, verified Undo and offline/browser-downloaded cabinets remain supported. The 0.2.1 mixed-helper fix and prior receipt compatibility are retained.
 
 ## Downloads
 
-- **Bridge81-0.3.0-source.zip**: full project, independent repair, optional verified Python setup, examples and documentation. Open `Start-Bridge81.cmd` or `Repair-RenPy.cmd`.
-- **Bridge81-0.3.0-windows-x64-preview.zip**: standalone native workbench plus independent repair utility. Extract the whole folder. The workbench needs a working UCRT; the repair launcher does not depend on its Python runtime.
+- **Bridge81-0.4.0-source.zip**: full project, independent repair, optional verified Python setup, examples and documentation. Open `Start-Bridge81.cmd` or `Repair-RenPy.cmd`.
+- **Bridge81-0.4.0-windows-x64-preview.zip**: standalone native workbench plus independent repair utility. Extract the whole folder. The workbench needs a working UCRT; the repair launcher does not depend on its Python runtime.
 - **Wheel / sdist**: Python CLI/package for developers. Use a complete ZIP for the independent repair launcher and external resources.
 - **SHA256SUMS** covers all five build files.
 
