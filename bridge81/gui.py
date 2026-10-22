@@ -95,6 +95,7 @@ class App:
         self.busy = False
         self.closing = False
         self.last_report = None
+        self.runtime_log_path = None
         root.title("Bridge81 — Python · Unix tools · Older games")
         root.geometry("1000x660")
         root.minsize(780, 570)
@@ -310,6 +311,12 @@ class App:
         repair_row.pack(fill="x", pady=(0, 3))
         ttk.Button(repair_row, text="Repair missing runtime", command=self.repair_runtime).pack(side="left", padx=(0, 10))
         ttk.Label(repair_row, text="For api-ms-win-crt DLL errors; also available as Repair-RenPy.cmd", style="Sub.TLabel").pack(side="left")
+        log_row = ttk.Frame(parent)
+        log_row.pack(fill="x", pady=(3, 7))
+        ttk.Button(log_row, text="Read saved log…", command=self.inspect_runtime_log).pack(side="left", padx=(0, 8))
+        self.export_log_button = ttk.Button(log_row, text="Save log hints…", command=self.export_runtime_log, state="disabled")
+        self.export_log_button.pack(side="left", padx=(0, 10))
+        ttk.Label(log_row, text="Private loader / import / graphics hints", style="Sub.TLabel").pack(side="left")
         self.game_output = self.text_box(parent)
         self.set_text(self.game_output, "Inspect the extracted Windows game before launching.\n\nKnown OS or architecture blockers prevent launch. Other results remain UNVERIFIED until tested on your laptop.\n\nFor graphics problems, hold Shift while starting the game or press Shift+G, then try GL or ANGLE in its graphics menu.")
 
@@ -341,6 +348,54 @@ class App:
             self.set_text(self.game_output, report_markdown(report))
             self.status.set("Read-only DLL evidence: %s modules, %s imports. System availability remains unknown." % (report['summary']['modules'], report['summary']['imports']))
         except (BridgeError, OSError) as exc:
+            self.fail(exc)
+
+    def inspect_runtime_log(self):
+        from tkinter import filedialog
+        value = filedialog.askopenfilename(parent=self.root, title="Choose a stable saved runtime log",
+                                          initialdir=self.folder.get() or None,
+                                          filetypes=(("Saved text logs", "*.txt *.log"), ("All files", "*")))
+        if not value:
+            return
+        self.runtime_log_path = None
+        self.export_log_button.configure(state="disabled")
+        self.set_text(self.game_output, "Reading saved-log evidence. Raw log lines and private paths are withheld.")
+        try:
+            from .runtime_log import load, report_markdown as log_markdown
+            report = load(value)
+            self.runtime_log_path = Path(value).absolute()
+            self.set_text(self.game_output, log_markdown(report))
+            self.export_log_button.configure(state="normal")
+            self.status.set("Saved-log evidence: %s hint groups in %s lines. Confirm this log belongs to the current build." % (len(report["findings"]), report["lines"]))
+        except (BridgeError, OSError) as exc:
+            self.fail(exc)
+
+    def export_runtime_log(self):
+        from tkinter import filedialog
+        if self.runtime_log_path is None:
+            self.status.set("Read a saved log before exporting its hints.")
+            return
+        try:
+            from .runtime_log import load, report_markdown as log_markdown
+            report = load(self.runtime_log_path)  # Re-read the source; never export cached evidence.
+            self.set_text(self.game_output, log_markdown(report))
+            value = filedialog.asksaveasfilename(parent=self.root, title="Save private runtime-log hints to a NEW file",
+                                                initialfile="bridge81-log-hints.md", defaultextension=".md",
+                                                filetypes=(("Markdown", "*.md"), ("JSON", "*.json")))
+            if not value:
+                return
+            target = Path(value)
+            if target.resolve() == self.runtime_log_path.resolve():
+                raise BridgeError("Choose a separate report file; the original log is never overwritten.")
+            text = json.dumps(report, indent=2) + "\n" if target.suffix.lower() == ".json" else log_markdown(report)
+            with target.open("x", encoding="utf-8") as stream:
+                stream.write(text)
+            self.status.set("Saved fresh log hints. Raw lines, private paths and game files were not included.")
+        except FileExistsError:
+            self.fail("Choose a new report filename; existing files are never overwritten.")
+        except (BridgeError, OSError) as exc:
+            self.export_log_button.configure(state="disabled")
+            self.runtime_log_path = None
             self.fail(exc)
 
     def current_report(self):

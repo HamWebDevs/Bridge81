@@ -22,6 +22,12 @@ Patterns are hints from a possibly stale saved log. Unrecognised text returns `n
 
 CLI status 0 means no recognised pattern, 1 means hints were found, and 2 means invalid/unsafe/unreadable input. Select a stable regular UTF-8 file of at most 2 MiB and 30,000 lines; symlinks, redirected directories and special files are refused. No partial-log success is returned when limits are exceeded.
 
+## Desktop workflow
+
+In **Games**, choose **Read saved log…** and select a stable `log.txt`, `traceback.txt` or `.log` file. The output contains fixed hints and line locations, with raw lines and paths withheld. Choosing a log does not launch a game, apply a repair, or verify that the log belongs to the selected folder; confirm its build yourself.
+
+**Save log hints…** exports Markdown or JSON to a new file. Bridge81 reads the saved source again before export, so changed content is analysed afresh. Cancellation preserves the current selection. Failed reads disable export until another log is selected. The original log and existing report files are never overwritten. These exports are separate from **Export report**, which remains the fresh game-inspection report.
+
 ## DevPocket plugin
 
 Install Bridge81 and DevPocket in the same environment. Enable the second read-only plugin explicitly (Bash quoting shown):

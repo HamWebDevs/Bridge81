@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — 2026-10-22
+
+- Bring saved runtime-log inspection into the desktop Games tab with separate Read saved log and Save log hints controls.
+- Show the same private loader/import/graphics hints as the CLI, without exposing raw log lines or paths. Keep hints separate from game compatibility evidence.
+- Re-read stable saved logs at export, clear failed selections, preserve cancellation, and refuse overwriting the source or an existing report.
+- Add native GUI checks for private display, fresh export, JSON evidence, cancellation, collisions, failed reads and small-window controls. Keep all inspection read-only and the Python-free runtime repair available.
+
 ## 0.4.0 — 2026-10-21
 
 - Add `bridge81 runtime-log` for saved Windows/Ren'Py log hints: missing modules/procedures, invalid images, UCRT/Visual C++ mentions, Python import failures and graphics-context errors.
