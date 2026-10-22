@@ -17,12 +17,18 @@ from helpers import game
 
 def main():
     with tempfile.TemporaryDirectory(prefix="Bridge81 GUI ") as directory:
-        folder = Path(directory)
+        # Windows temp paths can use 8.3 aliases. The log reader intentionally
+        # rejects noncanonical paths, so use the real disposable fixture path.
+        folder = Path(directory).resolve()
         script = folder / "hello world.py"
         script.write_text("import sys,json; print(json.dumps(sys.argv[1:]))\n")
         root = tk.Tk()
         root.withdraw()
         app = App(root)
+        def unexpected_error(error):
+            raise AssertionError("Unexpected GUI error: " + str(error))
+        # Unexpected errors must fail CI instead of blocking on a modal dialog.
+        app.fail = unexpected_error
         try:
             app.script.set(str(script))
             app.script_args.set('["two words", "$(not-a-command)"]')
@@ -58,6 +64,7 @@ def main():
             with mock.patch('tkinter.filedialog.askopenfilename', return_value=''):
                 app.inspect_runtime_log()
             assert app.runtime_log_path == log
+            assert log.read_text() == original
             log.write_text('PRIVATE_PERSON\nWinError 193: not a valid Win32 application\n', encoding='utf-8')
             export = folder / 'log-hints.json'
             with mock.patch('tkinter.filedialog.asksaveasfilename', return_value=str(export)):
